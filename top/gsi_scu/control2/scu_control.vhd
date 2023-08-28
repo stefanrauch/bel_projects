@@ -273,6 +273,9 @@ architecture rtl of scu_control is
   signal s_lemo_oe    : std_logic_vector(1 downto 0);
   signal s_lemo_input : std_logic_vector(1 downto 0);
 
+  signal s_debug_wr_pps_led    : std_logic;
+  signal s_debug_wr_pps_pair_p : std_logic;
+
   constant io_mapping_table : t_io_mapping_table_arg_array(0 to 1) :=
   (
   -- Name[11 Bytes], Special Purpose, SpecOut, SpecIn, Index, Direction,   Channel,  OutputEnable, Termination, Logic Level
@@ -321,6 +324,8 @@ begin
       core_clk_125m_local_i  => clk_125m_local_i,
       core_clk_wr_ref_o      => clk_ref,
       core_rstn_wr_ref_o     => rstn_ref,
+      debug_wr_pps_led       => s_debug_wr_pps_led,
+      debug_wr_pps_pair_p    => s_debug_wr_pps_pair_p,
       gpio_o                 => s_lemo_io,
       gpio_i                 => s_lemo_input,
       gpio_oen_o             => s_lemo_oe,
@@ -470,8 +475,8 @@ begin
   sfp1_mod2 <= 'Z';
 
   -- LEMO Outputs
-  lemo_io(1)     <= s_lemo_io(0) when s_lemo_oe(0)='1'   else 'Z';
-  lemo_io(2)     <= s_lemo_io(1) when s_lemo_oe(1)='1'   else 'Z';
+  lemo_io(1)     <= s_debug_wr_pps_led; -- <= s_lemo_io(0) when s_lemo_oe(0)='1'   else 'Z';
+  lemo_io(2)     <= s_debug_wr_pps_pair_p; -- <= s_lemo_io(1) when s_lemo_oe(1)='1'   else 'Z';
 
   -- LEMO Inputs
   s_lemo_input(0) <= lemo_io(1);
@@ -482,8 +487,8 @@ begin
   lemo_led(2) <= not(s_lemo_leds(2));
 
   -- LEMO OE
-  lemo_en_in(1) <= '0' when s_lemo_oe(0)='1' else '1';
-  lemo_en_in(2) <= '0' when s_lemo_oe(1)='1' else '1';
+  lemo_en_in(1) <= '0'; -- when s_lemo_oe(0)='1' else '1';
+  lemo_en_in(2) <= '0'; -- when s_lemo_oe(1)='1' else '1';
 
   -- Extend LEMO input/outputs to LEDs at 20Hz
   lemo_leds : for i in 1 to 2 generate
