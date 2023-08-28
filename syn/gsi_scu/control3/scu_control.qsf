@@ -1,3 +1,4 @@
+
 set_global_assignment -name AHDL_FILE ../../../modules/modulbus/i2c.tdf
 set_global_assignment -name ALLOW_POWER_UP_DONT_CARE OFF
 set_global_assignment -name AUTO_MERGE_PLLS OFF
@@ -126,6 +127,57 @@ set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/module
 set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/modules/wishbone/wb_spi/spi_shift.v" -library work
 set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/modules/wishbone/wb_spi/spi_top.v" -library work
 set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/modules/wishbone/wb_spi/timescale.v" -library work
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_64b_x1_pipen1b.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_64b_x4_pipen1b.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_64b_x8_pipen1b.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_hip_256_pipen1b.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_hip_pipen1b.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pclk_align.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pclk_pll.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_phasefifo.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_100_125.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_100_250.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_125_250.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_15625_125.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_250_100.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_phy0.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_phy1_62p5.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_phy2.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_phy3_62p5.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_phy4_62p5.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_pll_phy5_62p5.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcierd_reconfig_clk_pll.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_reconfig_3cgx.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_reconfig_4sgx.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_rs_serdes.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_1sgx_x1_12500.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_1sgx_x1_15625.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_1sgx_x4_12500.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_1sgx_x4_15625.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2agx_x1d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2agx_x1d_gen1_16p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2agx_x4d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2agx_x4d_gen1_16p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2agx_x8d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2sgx_x1d_10000.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2sgx_x4d_10000.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_2sgx_x8d_10000.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_3cgx_x1d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_3cgx_x1d_gen1_16p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_3cgx_x2d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_3cgx_x4d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x1d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x1d_gen1_16p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x1d_gen2_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x4d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x4d_gen1_16p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x4d_gen2_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x8d_gen1_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/altpcie_serdes_4sgx_x8d_gen2_08p.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/pciexp64_dlink.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/pciexp64_trans.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/pciexp_dcram.v"
+set_global_assignment -name VERILOG_FILE "../../../ip_cores/general-cores/platform/altera/wb_pcie/ip_compiler_for_pci_express-library/pciexpx8f_confctrl.v"
 set_global_assignment -name VERILOG_FILE "../../../ip_cores/pci-core/src/hdl/verilog/bus_commands.v" -library work
 set_global_assignment -name VERILOG_FILE "../../../ip_cores/pci-core/src/hdl/verilog/pci_async_reset_flop.v" -library work
 set_global_assignment -name VERILOG_FILE "../../../ip_cores/pci-core/src/hdl/verilog/pci_bridge32.v" -library work
@@ -531,6 +583,9 @@ set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/led_n.vhd -
 set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/lemo_io.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/local_125_to_12p5.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/local_20_to_12p5.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/prio_encoder/prio_encoder_16_4.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/prio_encoder/prio_encoder_256_8.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/prio_encoder/prio_encoder_64_6.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/slave_clk_switch.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/sys_clk_or_local_clk.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/aux_functions/tmr_scu_bus.vhd -library work
@@ -582,6 +637,8 @@ set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_qu
 set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_quad/fg_quad_ifa.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_quad/fg_quad_pkg.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_quad/fg_quad_scu_bus.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_quad/fg_quad_statistics.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_quad/ring_buffer.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/function_generators/fg_quad/wbmstr_core.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/function_generators/scu_slave_fg_pkg.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/function_generators/scu_slave_fg.vhd -library work
@@ -673,12 +730,14 @@ set_global_assignment -name VHDL_FILE ../../../modules/prioq2/prio.vhd -library 
 set_global_assignment -name VHDL_FILE ../../../modules/prioq2/queue_unit.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/psram/psram_pkg.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/psram/psram.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/remote_update/altasmi.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/asmi10/asmi10/altera_asmi_parallel_181/synth/asmi10_pkg.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/asmi10/asmi10/synth/asmi10.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/asmi5/asmi5/synthesis/asmi5.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/asmi_arriaII/asmi_arriaII/synthesis/asmi_arriaII.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/remote_update_pkg.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/remote_update.vhd -library work
+set_global_assignment -name VHDL_FILE ../../../modules/remote_update/wb_asmi_slave.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/wb_asmi.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/remote_update/wb_remote_update.vhd -library work
 set_global_assignment -name VHDL_FILE ../../../modules/reverse_lpb/reverse_lpb.vhd -library work
