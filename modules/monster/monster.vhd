@@ -143,6 +143,10 @@ entity monster is
     core_clk_20m_o         : out   std_logic;
     core_debug_o           : out   std_logic_vector(15 downto 0) := (others => 'Z');
     core_clk_debug_i       : in    std_logic;
+    -- debug
+    debug_wr_pps_led       : out std_logic;
+    debug_wr_pps_pair_p    : out std_logic;
+    debug_wr_ref_clk       : out std_logic;
     -- Required: white rabbit pins
     wr_onewire_io          : inout std_logic;
     wr_sfp_sda_io          : inout std_logic;
@@ -1809,11 +1813,16 @@ end generate;
       tm_time_valid_o      => tm_valid,
       tm_tai_o             => tm_tai,
       tm_cycles_o          => tm_cycles,
+      pps_led_o            => debug_wr_pps_led,
       pps_p_o              => pps,
       --dio_o                => open,
       rst_aux_n_o          => open,
       link_ok_o            => s_link_ok);
   end generate;
+
+  -- debug
+  debug_wr_pps_pair_p <= pps;
+  debug_wr_ref_clk    <= clk_ref;
 
   wr_a10 : if c_is_arria10 generate
   U_WR_CORE : xwr_core

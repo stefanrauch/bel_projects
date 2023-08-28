@@ -151,6 +151,10 @@ package monster_pkg is
       core_clk_20m_o         : out   std_logic;
       core_debug_o           : out   std_logic_vector(15 downto 0);
       core_clk_debug_i       : in    std_logic := '0';
+      -- debug
+      debug_wr_pps_led       : out std_logic;
+      debug_wr_pps_pair_p    : out std_logic;
+      debug_wr_ref_clk       : out std_logic;
       -- Required: white rabbit pins
       wr_onewire_io          : inout std_logic;
       wr_sfp_sda_io          : inout std_logic;
