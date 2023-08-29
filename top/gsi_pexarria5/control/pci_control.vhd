@@ -438,7 +438,7 @@ begin
   generic map(
     g_family  => c_family)
   port map(
-    datain    => s_debug_wr_pps_led,
+    datain    => not(s_debug_wr_pps_led),
     dataout   => p25,
     dataout_b => n25
   );
@@ -447,7 +447,7 @@ begin
   generic map(
     g_family  => c_family)
   port map(
-    datain    => s_debug_wr_pps_pair_p,
+    datain    => not(s_debug_wr_pps_pair_p),
     dataout   => p27,
     dataout_b => n27
   );
