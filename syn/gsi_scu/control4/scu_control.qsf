@@ -719,6 +719,33 @@ set_global_assignment -name VHDL_FILE ../../../top/gsi_scu/control4/ramsize_pkg.
 set_global_assignment -name VHDL_FILE ../../../top/gsi_scu/control4/scu_control.vhd -library work
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to ctl
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to ctl[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to ctl[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to ctl[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[3]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[4]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[5]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[6]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to fd[7]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to onewire_ext_splz
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[3]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[4]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[5]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[6]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to pa[7]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to slrd
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to slwr
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to uclk
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to ures
 set_instance_assignment -name IO_STANDARD "1.8 V" -to altera_reserved_ntrst
 set_instance_assignment -name IO_STANDARD "1.8 V" -to altera_reserved_tck
 set_instance_assignment -name IO_STANDARD "1.8 V" -to altera_reserved_tdi
