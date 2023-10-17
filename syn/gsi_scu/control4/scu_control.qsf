@@ -6,7 +6,7 @@ set_global_assignment -name AUTO_SHIFT_REGISTER_RECOGNITION OFF
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
 set_global_assignment -name CVP_CONFDONE_OPEN_DRAIN OFF
 set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
-set_global_assignment -name DEVICE 10ax027e3f29e2sg
+set_global_assignment -name DEVICE 10ax027e2f29e1hg
 set_global_assignment -name ECO_OPTIMIZE_TIMING ON
 set_global_assignment -name EDA_BOARD_DESIGN_BOUNDARY_SCAN_TOOL "<None>"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT NONE -section_id eda_board_design_boundary_scan
