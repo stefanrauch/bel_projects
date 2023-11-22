@@ -54,27 +54,27 @@ entity scu_control is
     ser1_txd          : in  std_logic;  -- RX/TX view from ComX
     nTHRMTRIP         : in  std_logic;
     WDT               : in  std_logic;
-    fpga_res_i        : in  std_logic; 
+    fpga_res_i        : in  std_logic;
     nSys_Reset        : in    std_logic;  -- Reset From ComX
 
     -----------------------------------------------------------------------
     -- SCU Bus
     -----------------------------------------------------------------------
-    A_D               : inout std_logic_vector(15 downto 0);
-    A_A               : out   std_logic_vector(15 downto 0);
-    A_nTiming_Cycle   : out   std_logic;
-    A_nDS             : out   std_logic;
-    A_nReset          : out   std_logic;
-    nSel_Ext_Data_DRV : out   std_logic;
-    A_RnW             : out   std_logic;
-    A_Spare           : out   std_logic_vector(1 downto 0);
-    A_nSEL            : out   std_logic_vector(12 downto 1);
-    A_nDtack          : in    std_logic;
-    A_nSRQ            : in    std_logic_vector(12 downto 1);
-    A_SysClock        : out   std_logic;
-    ADR_TO_SCUB       : out   std_logic;
-    nADR_EN           : out   std_logic;
-    A_OneWire         : inout std_logic;
+    A_D               : inout std_logic_vector(15 downto 0) := (others => 'Z');
+    A_A               : out   std_logic_vector(15 downto 0) := (others => 'Z');
+    A_nTiming_Cycle   : out   std_logic := 'Z';
+    A_nDS             : out   std_logic := 'Z';
+    A_nReset          : out   std_logic := 'Z';
+    nSel_Ext_Data_DRV : out   std_logic := 'Z';
+    A_RnW             : out   std_logic := 'Z';
+    A_Spare           : out   std_logic_vector(1 downto 0) := (others => 'Z');
+    A_nSEL            : out   std_logic_vector(12 downto 1) := (others => 'Z');
+    A_nDtack          : inout std_logic := 'Z'; -- in !!!
+    A_nSRQ            : inout std_logic_vector(12 downto 1) := (others => 'Z'); -- in !!!
+    A_SysClock        : out   std_logic := 'Z';
+    ADR_TO_SCUB       : out   std_logic := 'Z';
+    nADR_EN           : out   std_logic := 'Z';
+    A_OneWire         : inout std_logic := 'Z';
 
     -----------------------------------------------------------------------
     -- Misc.
@@ -111,13 +111,13 @@ entity scu_control is
     -----------------------------------------------------------------------
     -- usb
     -----------------------------------------------------------------------
-    slrd : out   std_logic;
-    slwr : out   std_logic;
+    slrd : out   std_logic := 'Z';
+    slwr : out   std_logic := 'Z';
     fd   : inout std_logic_vector(7 downto 0) := (others => 'Z');
     pa   : inout std_logic_vector(7 downto 0) := (others => 'Z');
-    ctl  : in    std_logic_vector(2 downto 0);
-    uclk : in    std_logic;
-    ures : out   std_logic;
+    ctl  : inout std_logic_vector(2 downto 0) := (others => 'Z'); -- in !!!
+    uclk : inout std_logic := 'Z';  -- in !!!
+    ures : out   std_logic := 'Z';
 
     -----------------------------------------------------------------------
     -- leds onboard
@@ -238,7 +238,7 @@ begin
       g_family             => c_family,
       g_project            => c_project,
       g_flash_bits         => 25, -- !!! TODO: Check this
-      g_psram_bits         => c_psram_bits,
+      --g_psram_bits         => c_psram_bits,
       g_gpio_in            => 2,
       g_gpio_out           => 11,
       g_lvds_in            => 3,
@@ -246,13 +246,13 @@ begin
       g_en_user_ow         => true,
       g_en_ddr3            => false,
       g_en_cfi             => false,
-      g_en_i2c_wrapper     => true,
-      g_num_i2c_interfaces => 1,
-      g_en_scubus          => true,
+      g_en_i2c_wrapper     => false,
+      --g_num_i2c_interfaces => 1,
+      g_en_scubus          => false,
       g_en_pcie            => true,
       g_en_tlu             => false,
-      g_en_usb             => true,
-      g_en_psram           => true,
+      g_en_usb             => false,
+      g_en_psram           => false,
       g_io_table           => io_mapping_table,
       g_en_tempsens        => false,
       g_a10_use_sys_fpll   => false,
@@ -294,16 +294,16 @@ begin
       led_link_act_o          => s_led_link_act,
       led_track_o             => s_led_track,
       led_pps_o               => s_led_pps,
-      scubus_a_a              => A_A,
-      scubus_a_d              => A_D,
-      scubus_nsel_data_drv    => nSel_Ext_Data_DRV,
-      scubus_a_nds            => A_nDS,
-      scubus_a_rnw            => A_RnW,
-      scubus_a_ndtack         => A_nDtack,
-      scubus_a_nsrq           => A_nSRQ,
-      scubus_a_nsel           => A_nSEL,
-      scubus_a_ntiming_cycle  => A_nTiming_Cycle,
-      scubus_a_sysclock       => A_SysClock,
+      --scubus_a_a              => A_A,
+      --scubus_a_d              => A_D,
+      --scubus_nsel_data_drv    => nSel_Ext_Data_DRV,
+      --scubus_a_nds            => A_nDS,
+      --scubus_a_rnw            => A_RnW,
+      --scubus_a_ndtack         => A_nDtack,
+      --scubus_a_nsrq           => A_nSRQ,
+      --scubus_a_nsel           => A_nSEL,
+      --scubus_a_ntiming_cycle  => A_nTiming_Cycle,
+      --scubus_a_sysclock       => A_SysClock,
       ow_io(0)                => onewire_ext,
       ow_io(1)                => A_OneWire,
       pcie_refclk_i           => pcie_refclk_i,
@@ -311,45 +311,45 @@ begin
       pcie_rx_i               => pcie_rx_i,
       pcie_tx_o               => pcie_tx_o,
       -- I2C
-      i2c_scl_pad_i            => s_i2c_scl_pad_in,
-      i2c_scl_pad_o            => s_i2c_scl_pad_out,
-      i2c_scl_padoen_o         => s_i2c_scl_padoen,
-      i2c_sda_pad_i            => s_i2c_sda_pad_in,
-      i2c_sda_pad_o            => s_i2c_sda_pad_out,
-      i2c_sda_padoen_o         => s_i2c_sda_padoen,
+      --i2c_scl_pad_i            => s_i2c_scl_pad_in,
+      --i2c_scl_pad_o            => s_i2c_scl_pad_out,
+      --i2c_scl_padoen_o         => s_i2c_scl_padoen,
+      --i2c_sda_pad_i            => s_i2c_sda_pad_in,
+      --i2c_sda_pad_o            => s_i2c_sda_pad_out,
+      --i2c_sda_padoen_o         => s_i2c_sda_padoen,
       -- FX2 USB
-      usb_rstn_o              => ures,
-      usb_ebcyc_i             => pa(3),
-      usb_speed_i             => pa(0),
-      usb_shift_i             => pa(1),
-      usb_readyn_io           => pa(7),
-      usb_fifoadr_o           => pa(5 downto 4),
-      usb_sloen_o             => pa(2),
-      usb_fulln_i             => ctl(1),
-      usb_emptyn_i            => ctl(2),
-      usb_slrdn_o             => slrd,
-      usb_slwrn_o             => slwr,
-      usb_pktendn_o           => pa(6),
-      usb_fd_io               => fd,
+      --usb_rstn_o              => ures,
+      --usb_ebcyc_i             => pa(3),
+      --usb_speed_i             => pa(0),
+      --usb_shift_i             => pa(1),
+      --usb_readyn_io           => pa(7),
+      --usb_fifoadr_o           => pa(5 downto 4),
+      --usb_sloen_o             => pa(2),
+      --usb_fulln_i             => ctl(1),
+      --usb_emptyn_i            => ctl(2),
+      --usb_slrdn_o             => slrd,
+      --usb_slwrn_o             => slwr,
+      --usb_pktendn_o           => pa(6),
+      --usb_fd_io               => fd,
       -- PSRAM TODO: Multi Chip
-      ps_clk                 => psram_clk,
-      ps_addr                => psram_a,
-      ps_data                => psram_dq,
-      ps_seln(0)             => psram_lbn,
-      ps_seln(1)             => psram_ubn,
-      ps_cen                 => s_psram_cen,
-      ps_oen                 => psram_oen,
-      ps_wen                 => psram_wen,
-      ps_cre                 => psram_cre,
-      ps_advn                => psram_advn,
-      ps_wait                => psram_wait,
+      --ps_clk                 => psram_clk,
+      --ps_addr                => psram_a,
+      --ps_data                => psram_dq,
+      --ps_seln(0)             => psram_lbn,
+      --ps_seln(1)             => psram_ubn,
+      --ps_cen                 => s_psram_cen,
+      --ps_oen                 => psram_oen,
+      --ps_wen                 => psram_wen,
+      --ps_cre                 => psram_cre,
+      --ps_advn                => psram_advn,
+      --ps_wait                => psram_wait,
       hw_version             => x"0000000" & not scu_cb_version);
 
-  psram_cen(0) <= s_psram_cen when (s_gpio_o(7) = '1')  else '1';
-  psram_cen(1) <= s_psram_cen when (s_gpio_o(8) = '1')  else '1'; 
-  psram_cen(2) <= s_psram_cen when (s_gpio_o(9) = '1')  else '1'; 
-  psram_cen(3) <= s_psram_cen when (s_gpio_o(10) = '1') else '1'; 
- 
+  --psram_cen(0) <= s_psram_cen when (s_gpio_o(7) = '1')  else '1';
+  --psram_cen(1) <= s_psram_cen when (s_gpio_o(8) = '1')  else '1';
+  --psram_cen(2) <= s_psram_cen when (s_gpio_o(9) = '1')  else '1';
+  --psram_cen(3) <= s_psram_cen when (s_gpio_o(10) = '1') else '1';
+
   -- LEDs
   wr_led_pps    <= s_led_pps;                                             -- white = PPS
   wr_rgb_led(0) <= s_led_link_act;                                        -- WR-RGB Red
