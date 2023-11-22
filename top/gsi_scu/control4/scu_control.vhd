@@ -96,9 +96,9 @@ entity scu_control is
     -----------------------------------------------------------------------
     -- LVTTL IOs
     -----------------------------------------------------------------------
-    fastIO_p_i : in  std_logic_vector(2 downto 0);
-    fastIO_n_i : in  std_logic_vector(2 downto 0);
-    fastIO_p_o : out std_logic_vector(2 downto 0); -- Negativ Pin assigned by Quartus, manually assignment causes issues
+    --fastIO_p_i : in  std_logic_vector(2 downto 0);
+    --fastIO_n_i : in  std_logic_vector(2 downto 0);
+    fastIO_p_o : out std_logic_vector(2 downto 0) := (others => '0'); -- Negativ Pin assigned by Quartus, manually assignment causes issues
     lemo_out   : out std_logic_vector(3 downto 0); --Isolated Onboard TTL OUT
     lemo_in    : in  std_logic_vector(1 downto 0); --Isolated OnBoard TTL IN
 
@@ -200,7 +200,7 @@ architecture rtl of scu_control is
   signal clk_ref               : std_logic;
 
 
-  constant io_mapping_table : t_io_mapping_table_arg_array(0 to 18) :=
+  constant io_mapping_table : t_io_mapping_table_arg_array(0 to 12) :=
   (
   -- Name[12 Bytes], Special Purpose, SpecOut, SpecIn, Index, Direction,   Channel,  OutputEnable, Termination, Logic Level
     ("LEMO_IN_0  ",  IO_NONE,         false,   false,  0,     IO_INPUT,    IO_GPIO,  false,        false,       IO_TTL),
@@ -215,13 +215,7 @@ architecture rtl of scu_control is
     ("PSRAM_SEL_0",  IO_NONE,         false,   false,  7,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
     ("PSRAM_SEL_1",  IO_NONE,         false,   false,  8,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
     ("PSRAM_SEL_2",  IO_NONE,         false,   false,  9,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
-    ("PSRAM_SEL_3",  IO_NONE,         false,   false, 10,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
-    ("FAST_IN_0  ",  IO_NONE,         false,   false,  0,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVDS),
-    ("FAST_IN_1  ",  IO_NONE,         false,   false,  1,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVDS),
-    ("FAST_IN_2  ",  IO_NONE,         false,   false,  2,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVDS),
-    ("FAST_OUT_0 ",  IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_LVDS,  false,        true,        IO_LVDS),
-    ("FAST_OUT_1 ",  IO_NONE,         false,   false,  1,     IO_OUTPUT,   IO_LVDS,  false,        true,        IO_LVDS),
-    ("FAST_OUT_2 ",  IO_NONE,         false,   false,  2,     IO_OUTPUT,   IO_LVDS,  false,        true,        IO_LVDS)
+    ("PSRAM_SEL_3",  IO_NONE,         false,   false, 10,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL)
   );
 
   constant c_family       : string := "Arria 10 GX SCU4";
@@ -241,9 +235,9 @@ begin
       --g_psram_bits         => c_psram_bits,
       g_gpio_in            => 2,
       g_gpio_out           => 11,
-      g_lvds_in            => 3,
-      g_lvds_out           => 3,
-      g_en_user_ow         => true,
+      g_lvds_in            => 0,
+      g_lvds_out           => 0,
+      g_en_user_ow         => false,
       g_en_ddr3            => false,
       g_en_cfi             => false,
       g_en_i2c_wrapper     => false,
@@ -268,7 +262,7 @@ begin
       core_clk_125m_pllref_i  => clk_125m_tcb_pllref_i,
       core_clk_125m_local_i   => clk_125m_tcb_local_i,
       core_clk_125m_sfpref_i  => clk_125m_tcb_pllref_i,
-      core_clk_wr_ref_o      => clk_ref,
+      core_clk_wr_ref_o       => clk_ref,
       core_rstn_wr_ref_o      => rstn_ref,
       wr_onewire_io           => OneWire_CB,
       wr_sfp_sda_io           => sfp_mod2_io,
@@ -286,10 +280,10 @@ begin
       sfp_los_i               => sfp_los_i,
       gpio_i                  => lemo_in,
       gpio_o(10 downto 0)     => s_gpio_o(10 downto 0),
-      lvds_p_i                => s_lvds_p_i,
-      lvds_n_i                => s_lvds_n_i,
-      lvds_p_o                => s_lvds_p_o,
-      lvds_term_o             => s_lvds_term,
+      --lvds_p_i                => s_lvds_p_i,
+      --lvds_n_i                => s_lvds_n_i,
+      --lvds_p_o                => s_lvds_p_o,
+      --lvds_term_o             => s_lvds_term,
       led_link_up_o           => s_led_link_up,
       led_link_act_o          => s_led_link_act,
       led_track_o             => s_led_track,
@@ -358,11 +352,12 @@ begin
   user_led_0    <= s_gpio_o(2 downto 0);
 
   -- LEMOs
-  lemos : for i in 0 to 2 generate
-    s_lvds_p_i(i) <= fastIO_p_i(i);
-    s_lvds_n_i(i) <= fastIO_n_i(i);
-    fastIO_p_o(i) <= s_lvds_p_o(i);
-  end generate;
+  --lemos : for i in 0 to 2 generate
+    --s_lvds_p_i(i) <= fastIO_p_i(i);
+    --s_lvds_n_i(i) <= fastIO_n_i(i);
+    --fastIO_p_o(i) <= s_lvds_p_o(i);
+    --fastIO_p_o(i) <= '0';
+  --end generate;
   lemo_out <= s_gpio_o(6 downto 3);
 
   -- Lemo LEDs
