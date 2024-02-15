@@ -66,18 +66,18 @@ architecture rtl of psram is
   --   3      0 burst wrap-around
   --   2-0  111 continuous burst
   constant c_bcr_setup : std_logic_vector(ps_addr'range) :=
-    (0 => '1', 1 => '1', 2 => '1', 4 => '1', 8 => '1', 12 => '1', 19 => '1', 
+    (0 => '1', 1 => '1', 2 => '1', 4 => '1', 8 => '1', 12 => '1', 19 => '1',
      others => '0');
   constant c_bcr_time : natural := 5; -- at least 70ns in clocks
-  
+
   type t_state is (S_RESET, S_IDLE, S_WRITE_REQUEST, S_WRITE_WAIT, S_WRITE_LATCH, S_READ_REQUEST, S_READ_WAIT, S_READ_LATCH, S_BCR_REQUEST, S_BCR_WAIT, S_BCR_GAP, S_BCR_READ);
-  
+
   -- PSRAM input path
   signal r_state   : t_state := S_RESET;
   signal r_count   : unsigned(f_ceil_log2(c_bcr_time+1)-1 downto 0) := (others => '0');
   signal r_adr     : std_logic_vector(g_bits-1 downto 1);
   signal s_adr     : std_logic_vector(g_bits-1 downto 1);
-  
+
   -- Request FIFO interface
   signal r_pop     : std_logic;
   signal r_push    : std_logic;
@@ -86,7 +86,7 @@ architecture rtl of psram is
   signal s_full_n  : std_logic;
   signal s_fo_dat  : std_logic_vector(ps_data'range);
   signal s_fo_sel  : std_logic_vector(ps_seln'range);
-  
+
   -- Request FIFO state
   signal r_flags   : std_logic_vector(2 downto 0);
   signal s_flags   : std_logic_vector(2 downto 0);
@@ -94,13 +94,13 @@ architecture rtl of psram is
   signal r_lo_dat  : std_logic_vector(slave_i.dat'range);
   signal r_hi_sel  : std_logic_vector(slave_i.sel'range);
   signal r_lo_sel  : std_logic_vector(slave_i.sel'range);
-  
+
   -- PSRAM output path
   signal r_ack     : std_logic;
   signal r_wbo_mux : std_logic;
   signal r_dati_l  : std_logic_vector(ps_data'range);
   signal r_dati_h  : std_logic_vector(ps_data'range);
-  
+
 begin
 
   -- Keep the PSRAM synchronous to the SoC bus for lower latency
@@ -111,7 +111,7 @@ begin
   slave_o.stall <= not r_push;
   slave_o.dat(31 downto 16) <= r_dati_h;
   slave_o.dat(15 downto  0) <= r_dati_l;
-  
+
   fsm : process(clk_i, rstn_i) is
   begin
     if rstn_i = '0' then
@@ -121,7 +121,7 @@ begin
       case r_state is
         when S_RESET =>
           r_state <= S_BCR_REQUEST;
-      
+
         when S_IDLE =>
           if (slave_i.cyc and slave_i.stb) = '1' then
             if slave_i.we = '1' then
@@ -130,58 +130,58 @@ begin
               r_state <= S_READ_REQUEST;
             end if;
           end if;
-                
+
         when S_WRITE_REQUEST =>
           r_state <= S_WRITE_WAIT;
-          
+
         when S_WRITE_WAIT => -- r_pop is not yet valid
           r_state <= S_WRITE_LATCH;
-        
+
         when S_WRITE_LATCH =>
           if r_pop = '1' and s_last = '1' then
             r_state <= S_IDLE;
           end if;
-            
+
         when S_READ_REQUEST =>
           r_state <= S_READ_WAIT;
-        
+
         when S_READ_WAIT => -- r_pop is not yet valid
           r_state <= S_READ_LATCH;
-        
+
         when S_READ_LATCH =>
           if r_pop = '1' and s_last = '1' then
             r_state <= S_IDLE;
           end if;
-        
+
         when S_BCR_REQUEST =>
           r_state <= S_BCR_WAIT;
-        
+
         when S_BCR_WAIT =>
           r_count <= r_count + 1;
           if r_count = c_bcr_time then
             r_state <= S_BCR_GAP;
           end if;
-        
+
         when S_BCR_GAP =>
           r_state <= S_BCR_READ;
-          
+
         when S_BCR_READ =>
           r_state <= S_IDLE;
       end case;
     end if;
   end process;
-  
+
   -- Burst-mode has 8 word wrap-around (low 3 bits)
   s_adr(r_adr'high downto g_row_bits) <= r_adr(r_adr'high downto g_row_bits);
   s_adr(g_row_bits-1 downto 1) <= std_logic_vector(unsigned(r_adr(g_row_bits-1 downto 1)) + 1);
-  
+
   -- Push requests from WB input the FIFO
   -- Accept any request in S_IDLE; otherwise, accept requests which continues the burst
   wb_input : process(clk_i, rstn_i) is
   begin
     if rstn_i = '0' then
       r_push <= '0';
-      r_adr  <= (others => '-');
+      r_adr  <= (others => '0');
     elsif rising_edge(clk_i) then
       r_push <= '0';
       case r_state is
@@ -211,7 +211,7 @@ begin
       end case;
     end if;
   end process;
-  
+
   -- 32:16 FIFO process, big-endian
   s_fo_dat <= r_lo_dat(31 downto 16);
   s_fo_sel <= r_lo_sel( 3 downto  2);
@@ -225,10 +225,10 @@ begin
   begin
     if rstn_i = '0' then
       r_flags  <= "000";
-      r_hi_dat <= (others => '-');
-      r_lo_dat <= (others => '-');
-      r_hi_sel <= (others => '-');
-      r_lo_sel <= (others => '-');
+      r_hi_dat <= (others => '0');
+      r_lo_dat <= (others => '0');
+      r_hi_sel <= (others => '0');
+      r_lo_sel <= (others => '0');
     elsif rising_edge(clk_i) then
       if r_push = '1' then
         r_hi_dat <= slave_i.dat;
@@ -243,15 +243,15 @@ begin
           r_lo_sel <= r_hi_sel;
         end if;
       end if;
-      
+
       -- Report bad pushes
       assert (r_push = '0' or (r_flags(2) = '0' and r_flags /= "001"))
       report "Forbidden push" severity error;
-      
+
       r_flags <= s_flags;
     end if;
   end process;
-  
+
   fifo_fsm : process(r_flags, r_push, r_pop) is
   begin
     case r_flags is
@@ -296,17 +296,17 @@ begin
           s_flags <= "111";
         end if;
       when others => -- impossible state
-        s_flags <= "---";
+        s_flags <= "000";
     end case;
   end process;
-  
+
   -- Combine two 16-bit words into one 32-bit word
   wb_output : process(clk_i) is
   begin
     if rising_edge(clk_i) then
       r_wbo_mux <= '0';
       r_ack     <= '0';
-      r_dati_h  <= (others => '-');
+      r_dati_h  <= (others => '0');
       case r_state is
         when S_WRITE_LATCH | S_READ_LATCH =>
           if r_pop = '1' then
@@ -319,7 +319,7 @@ begin
       end case;
     end if;
   end process;
-  
+
   -- Simple fast input registers for good timing closure
   sram_input : process(clk_i) is
   begin
@@ -328,43 +328,43 @@ begin
       r_dati_l <= ps_data;
     end if;
   end process;
-  
+
   sram_output : process(clk_i, rstn_i) is
   begin
     if rstn_i = '0' then
-      ps_addr <= (others => '-');
+      ps_addr <= (others => '0');
       ps_data <= (others => 'Z');
       ps_advn <= '1';
       ps_cen  <= '1';
-      ps_seln <= (others => '-');
+      ps_seln <= (others => '0');
       ps_wen  <= '1';
       ps_oen  <= '1';
       ps_cre  <= '0';
     elsif falling_edge(clk_i) then
       case r_state is
-      
+
         when S_IDLE | S_RESET | S_BCR_GAP =>
-          ps_addr <= (others => '-');
+          ps_addr <= (others => '0');
           ps_data <= (others => 'Z');
           ps_advn <= '1';
           ps_cen  <= '1';
-          ps_seln <= (others => '-');
+          ps_seln <= (others => '0');
           ps_wen  <= '1';
           ps_oen  <= '1';
           ps_cre  <= '0';
-      
+
         when S_WRITE_REQUEST =>
           ps_addr <= r_adr & "0";
           ps_data <= r_adr(15 downto 1) & "0";
           ps_advn <= '0';
           ps_cen  <= '0';
-          ps_seln <= (others => '-');
+          ps_seln <= (others => '0');
           ps_wen  <= '0';
           ps_oen  <= '1';
           ps_cre  <= '0';
-        
+
         when S_WRITE_WAIT | S_WRITE_LATCH =>
-          ps_addr <= (others => '-');
+          ps_addr <= (others => '0');
           ps_data <= s_fo_dat;
           ps_advn <= '1';
           ps_cen  <= '0';
@@ -372,7 +372,7 @@ begin
           ps_wen  <= '0';
           ps_oen  <= '1';
           ps_cre  <= '0';
-        
+
         when S_READ_REQUEST =>
           ps_addr <= r_adr & "0";
           ps_data <= r_adr(15 downto 1) & "0";
@@ -382,9 +382,9 @@ begin
           ps_wen  <= '1';
           ps_oen  <= '1';
           ps_cre  <= '0';
-          
+
         when S_READ_WAIT | S_READ_LATCH =>
-          ps_addr <= (others => '-');
+          ps_addr <= (others => '0');
           ps_data <= (others => 'Z');
           ps_advn <= '1';
           ps_cen  <= '0';
@@ -392,29 +392,29 @@ begin
           ps_wen  <= '1';
           ps_oen  <= '0';
           ps_cre  <= '0';
-        
+
         when S_BCR_REQUEST =>
           ps_addr <= c_bcr_setup;
           ps_data <= c_bcr_setup(ps_data'range);
           ps_advn <= '0';
           ps_cen  <= '0';
-          ps_seln <= (others => '-');
+          ps_seln <= (others => '0');
           ps_wen  <= '1';
           ps_oen  <= '1';
           ps_cre  <= '1';
-        
+
         when S_BCR_WAIT =>
           ps_addr <= c_bcr_setup;
           ps_data <= c_bcr_setup(ps_data'range);
           ps_advn <= '1';
           ps_cen  <= '0';
-          ps_seln <= (others => '-');
+          ps_seln <= (others => '0');
           ps_wen  <= '0';
           ps_oen  <= '1';
           ps_cre  <= '1';
-        
+
         when S_BCR_READ => -- read wherever
-          ps_addr <= (others => '-');
+          ps_addr <= (others => '0');
           ps_data <= (others => 'Z');
           ps_advn <= '0';
           ps_cen  <= '0';
@@ -426,5 +426,5 @@ begin
       end case;
     end if;
   end process;
-  
+
 end rtl;
