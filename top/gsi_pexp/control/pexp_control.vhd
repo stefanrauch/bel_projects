@@ -6,6 +6,7 @@ library work;
 use work.monster_pkg.all;
 use work.altera_lvds_pkg.all;
 use work.ramsize_pkg.c_lm32_ramsizes;
+use work.altera_networks_pkg.all;
 
 entity pexp_control is
   generic(
@@ -154,6 +155,7 @@ architecture rtl of pexp_control is
 
   signal clk_sys       : std_logic;
   signal clk_200m      : std_logic;
+  signal clk_10m       : std_logic;
 
   signal s_led_status_monster : std_logic_vector(6 downto 1);
   signal s_led_user_monster   : std_logic_vector(8 downto 1);
@@ -201,7 +203,7 @@ architecture rtl of pexp_control is
 
 
 
-  constant io_mapping_table : t_io_mapping_table_arg_array(0 to 23) :=
+  constant io_mapping_table : t_io_mapping_table_arg_array(0 to 25) :=
   (
   -- Name[11 Bytes], Special Purpose, SpecOut, SpecIn, Index, Direction,   Channel,  OutputEnable, Termination, Logic Level
     ("LED1       ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL  ), -- user LEDs
@@ -226,8 +228,10 @@ architecture rtl of pexp_control is
     ("IO1        ", IO_NONE,         false,   false,  0,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL), -- front panel IOs
     ("IO2        ", IO_NONE,         false,   false,  1,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL),
     ("IO3        ", IO_NONE,         false,   false,  2,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL),
-    ("IO4        ", IO_NONE,         false,   false,  3,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL),
-    ("IO5        ", IO_NONE,         false,   false,  4,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL)
+    ("IO4        ", IO_NONE,         false,   false,  3,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVTTL),
+    ("IO5        ", IO_NONE,         false,   false,  4,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVTTL),
+    ("IO4_PPS    ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVTTL),
+    ("IO5_10MHZ  ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVTTL)
   );
 
 
@@ -272,12 +276,12 @@ begin
       g_family            => c_family,
       g_project           => c_project,
       g_flash_bits        => 25,
-      g_lvds_inout        => 5,  -- 5 LEMOs at front panel
-      g_lvds_in           => 0,
+      g_lvds_inout        => 3,  -- 5 LEMOs at front panel
+      g_lvds_in           => 2,
       g_lvds_out          => 0,
       g_gpio_out          => 9,  -- 8 on-boards LEDs, internal HW test enable
       g_gpio_in           => 10, -- FPGA button and HEX switch (1+4), CPLD button and HEX switch (1+4)
-      g_fixed             => 0,
+      g_fixed             => 2,
       g_lvds_invert       => false,
       g_en_usb            => true,
       g_en_lcd            => true,
@@ -302,6 +306,7 @@ begin
       core_rstn_i            => fpga_res_i,
       core_clk_sys_o         => clk_sys,
       core_clk_200m_o        => clk_200m,
+      core_clk_10m_o         => clk_10m,
       core_debug_o           => core_debug_out,
 
       wr_onewire_io          => rom_data_io,
@@ -324,15 +329,15 @@ begin
       gpio_o                 => s_gpio_out,
       gpio_i                 => s_gpio_in,
 
-      lvds_p_i               => s_lvds_p_i,
-      lvds_n_i               => s_lvds_n_i,
-      lvds_i_led_o           => s_lvds_i_led,
+      lvds_p_i               => s_lvds_p_i(4 downto 0),
+      lvds_n_i               => s_lvds_n_i(4 downto 0),
+      lvds_i_led_o           => s_lvds_i_led(4 downto 0),
 
-      lvds_p_o               => s_lvds_p_o,
-      lvds_n_o               => s_lvds_n_o,
-      lvds_o_led_o           => s_lvds_o_led,
-      lvds_oen_o             => s_lvds_oe,
-      lvds_term_o            => s_lvds_term_en,
+      lvds_p_o               => s_lvds_p_o(2 downto 0),
+      lvds_n_o               => s_lvds_n_o(2 downto 0),
+      lvds_o_led_o           => s_lvds_o_led(2 downto 0),
+      lvds_oen_o             => s_lvds_oe(2 downto 0),
+      lvds_term_o(2 downto 0) => s_lvds_term_en(2 downto 0),
 
       led_link_up_o          => s_led_link_up,
       led_link_act_o         => s_led_link_act,
@@ -374,6 +379,34 @@ begin
         s_blink_counter <= s_blink_counter + 1;
     end if;
   end process;
+
+  -- Special Output
+  -- s_lvds_p_o(3)    <= s_led_pps;
+  buffer_pps : altera_lvds_obuf
+    generic map(
+      g_family  => c_family)
+    port map(
+      datain    => s_led_pps,
+      dataout   => s_lvds_p_o(3),
+      dataout_b => s_lvds_n_o(3)
+    );
+
+  --s_lvds_p_o(4)    <= clk_10m;
+  buffer_10mhz : altera_lvds_obuf
+    generic map(
+      g_family  => c_family)
+    port map(
+      datain    => clk_10m,
+      dataout   => s_lvds_p_o(4),
+      dataout_b => s_lvds_n_o(4)
+    );
+
+  s_lvds_o_led(3)   <= s_led_pps;
+  s_lvds_o_led(4)   <= s_led_track;
+  s_lvds_oe(3)      <= '1';
+  s_lvds_oe(4)      <= '1';
+  s_lvds_term_en(3) <= '0';
+  s_lvds_term_en(4) <= '0';
 
   -- hex switches as gpio inputs
   s_gpio_in(3 downto 0) <= not hswf_i; -- FPGA HEX switch
