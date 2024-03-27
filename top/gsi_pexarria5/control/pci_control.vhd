@@ -4,7 +4,9 @@ use ieee.numeric_std.all;
 
 library work;
 use work.monster_pkg.all;
+use work.altera_lvds_pkg.all;
 use work.ramsize_pkg.c_lm32_ramsizes;
+use work.altera_networks_pkg.all;
 
 entity pci_control is
   port(
@@ -218,16 +220,17 @@ architecture rtl of pci_control is
   signal lvds_p_i      : std_logic_vector(4 downto 0);
   signal lvds_n_i      : std_logic_vector(4 downto 0);
   signal lvds_i_led    : std_logic_vector(4 downto 0);
-  signal lvds_p_o      : std_logic_vector(2 downto 0);
-  signal lvds_n_o      : std_logic_vector(2 downto 0);
-  signal lvds_o_led    : std_logic_vector(2 downto 0);
-  signal lvds_oen      : std_logic_vector(2 downto 0);
-  signal lvds_term     : std_logic_vector(2 downto 0);
+  signal lvds_p_o      : std_logic_vector(0 downto 0);
+  signal lvds_n_o      : std_logic_vector(0 downto 0);
+  signal lvds_o_led    : std_logic_vector(0 downto 0);
+  signal lvds_oen      : std_logic_vector(0 downto 0);
+  signal lvds_term     : std_logic_vector(0 downto 0);
 
   signal butis_clk_200 : std_logic;
   signal butis_t0_ts   : std_logic;
+  signal clk_10m       : std_logic;
 
-  constant io_mapping_table : t_io_mapping_table_arg_array(0 to 14) :=
+  constant io_mapping_table : t_io_mapping_table_arg_array(0 to 16) :=
   (
   -- Name[12 Bytes], Special Purpose, SpecOut, SpecIn, Index, Direction,   Channel,  OutputEnable, Termination, Logic Level
     ("LED1_BASE_R", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
@@ -239,12 +242,14 @@ architecture rtl of pci_control is
     ("LED3_ADD_G ", IO_NONE,         false,   false,  6,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
     ("LED4_ADD_W ", IO_NONE,         false,   false,  7,     IO_OUTPUT,   IO_GPIO,  false,        false,       IO_TTL),
     ("IO1        ", IO_NONE,         false,   false,  0,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL),
-    ("IO2        ", IO_NONE,         false,   false,  1,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL),
-    ("IO3        ", IO_NONE,         false,   false,  2,     IO_INOUTPUT, IO_LVDS,  true,         true,        IO_LVTTL),
+    ("IO2        ", IO_NONE,         false,   false,  1,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVTTL),
+    ("IO3        ", IO_NONE,         false,   false,  2,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVTTL),
     ("MHDMR_SYIN ", IO_NONE,         false,   false,  3,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVDS),
     ("MHDMR_TRIN ", IO_NONE,         false,   false,  4,     IO_INPUT,    IO_LVDS,  false,        false,       IO_LVDS),
     ("MHDMR_CK200", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVDS),
-    ("MHDMR_SYOU ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVDS)
+    ("MHDMR_SYOU ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVDS),
+    ("IO2_PPS    ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVTTL),
+    ("IO3_10MHZ  ", IO_NONE,         false,   false,  0,     IO_OUTPUT,   IO_FIXED, false,        false,       IO_LVTTL)
   );
   constant c_family       : string := "Arria V";
   constant c_project      : string := "pci_control";
@@ -260,10 +265,10 @@ begin
       g_project           => c_project,
       g_flash_bits        => 25,
       g_gpio_out          => 8,
-      g_lvds_in           => 2,
+      g_lvds_in           => 4,
       g_lvds_out          => 0,
-      g_lvds_inout        => 3,
-      g_fixed             => 2,
+      g_lvds_inout        => 1,
+      g_fixed             => 4,
       g_lvds_invert       => true,
       g_en_pcie           => true,
       g_en_usb            => true,
@@ -288,6 +293,7 @@ begin
       core_rstn_i             => pbs2,
       core_clk_butis_o        => butis_clk_200,
       core_clk_butis_t0_o     => butis_t0_ts,
+      core_clk_10m_o          => clk_10m,
       wr_onewire_io           => rom_data,
       wr_sfp_sda_io           => sfp4_mod2,
       wr_sfp_scl_io           => sfp4_mod1,
@@ -309,7 +315,7 @@ begin
       lvds_n_o                => lvds_n_o,
       lvds_o_led_o            => lvds_o_led,
       lvds_oen_o              => lvds_oen,
-      lvds_term_o(2 downto 0) => lvds_term,
+      lvds_term_o(0)          => lvds_term(0),
       led_link_up_o           => led_link_up,
       led_link_act_o          => led_link_act,
       led_track_o             => led_track,
@@ -380,16 +386,22 @@ begin
 
   -- LVDS->LEMO output enable / termination
   n10 <= '0' when lvds_oen(0)='1' else 'Z'; -- TTLIO1 output enable
-  n11 <= '0' when lvds_oen(1)='1' else 'Z'; -- TTLIO2 output enable
-  n14 <= '0' when lvds_oen(2)='1' else 'Z'; -- TTLIO3 output enable
+  --n11 <= '0' when lvds_oen(1)='1' else 'Z'; -- TTLIO2 output enable
+  --n14 <= '0' when lvds_oen(2)='1' else 'Z'; -- TTLIO3 output enable
+  n11 <= '0';
+  n14 <= '0';
 
   p9  <= '1' when lvds_term(0)='1' else '0'; -- TERMEN1 (terminate when input)
-  n9  <= '1' when lvds_term(1)='1' else '0'; -- TERMEN2 (terminate when input)
-  p10 <= '1' when lvds_term(2)='1' else '0'; -- TERMEN3 (terminate when input)
+  --n9  <= '1' when lvds_term(1)='1' else '0'; -- TERMEN2 (terminate when input)
+  --p10 <= '1' when lvds_term(2)='1' else '0'; -- TERMEN3 (terminate when input)
+  n9  <= '0';
+  p10 <= '0';
 
   p29 <= '0' when lvds_oen(0)='1' else 'Z'; -- FPLED1/TTLIO1 red
-  p26 <= '0' when lvds_oen(1)='1' else 'Z'; -- FPLED3/TTLIO2 red
-  p16 <= '0' when lvds_oen(2)='1' else 'Z'; -- FPLED5/TTLIO3 red
+  --p26 <= '0' when lvds_oen(1)='1' else 'Z'; -- FPLED3/TTLIO2 red
+  --p16 <= '0' when lvds_oen(2)='1' else 'Z'; -- FPLED5/TTLIO3 red
+  p26 <= '0';
+  p16 <= '0';
 
   -- LVDS inputs
   lvds_p_i(0) <= p21; -- TTLIO1
@@ -405,20 +417,43 @@ begin
 
   -- LVDS outputs
   n25 <= lvds_n_o(0); -- TTLIO1
-  n27 <= lvds_n_o(1); -- TTLIO2
-  n28 <= lvds_n_o(2); -- TTLIO3
+  --n27 <= lvds_n_o(1); -- TTLIO2
+  --n28 <= lvds_n_o(2); -- TTLIO3
   --n19 <= lvds_n_o(3); -- LVDS_3 / CK200 -- NEEDED FOR SERDES(FPGA) TO LVDS BUFFER(BOARD)
   --n24 <= lvds_n_o(4); -- LVDS_4 / SYOU  -- NEEDED FOR SERDES(FPGA) TO LVDS BUFFER(BOARD)
   p25 <= lvds_p_o(0); -- TTLIO1
-  p27 <= lvds_p_o(1); -- TTLIO2
-  p28 <= lvds_p_o(2); -- TTLIO3
+  --p27 <= lvds_p_o(1); -- TTLIO2
+  --p28 <= lvds_p_o(2); -- TTLIO3
   --p19 <= lvds_p_o(3); -- LVDS_3 / CK200 -- NEEDED FOR SERDES(FPGA) TO LVDS BUFFER(BOARD)
   --p24 <= lvds_p_o(4); -- LVDS_4 / SYOU  -- NEEDED FOR SERDES(FPGA) TO LVDS BUFFER(BOARD)
 
+  -- Special Output
+  -- s_lvds_p_o(3)    <= s_led_pps;
+  buffer_pps : altera_lvds_obuf
+    generic map(
+      g_family  => c_family)
+    port map(
+      datain    => led_pps,
+      dataout   => p27 ,
+      dataout_b => n27
+    );
+
+  --s_lvds_p_o(4)    <= clk_10m;
+  buffer_10mhz : altera_lvds_obuf
+    generic map(
+      g_family  => c_family)
+    port map(
+      datain    => clk_10m,
+      dataout   => p28,
+      dataout_b => n28
+    );
+
   -- LVDS activity LEDs
   n29 <= '0' when lvds_i_led(0)='1' else 'Z'; -- FPLED2/TTLIO1 blue
-  n26 <= '0' when lvds_i_led(1)='1' else 'Z'; -- FPLED4/TTLIO2 blue
-  n16 <= '0' when lvds_i_led(2)='1' else 'Z'; -- FPLED6/TTLIO3 blue
+  --n26 <= '0' when lvds_i_led(1)='1' else 'Z'; -- FPLED4/TTLIO2 blue
+  --n16 <= '0' when lvds_i_led(2)='1' else 'Z'; -- FPLED6/TTLIO3 blue
+  n26 <= led_pps;
+  n16 <= led_track;
   p5  <= '0' when lvds_i_led(3)='1' else 'Z'; -- LED1 (near HDMI = SYIN  / LVDS1)
   n5  <= '0' when lvds_i_led(4)='1' else 'Z'; -- LED2 (near HDMI = TRIN  / LVDS2)
   --p6  <= '0' when lvds_o_led(3)='1' else 'Z'; -- LED3 (near HDMI = CK200 / LVDS3) -- NEEDED FOR SERDES(FPGA) TO LVDS BUFFER(BOARD)
