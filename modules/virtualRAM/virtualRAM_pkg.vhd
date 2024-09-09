@@ -16,10 +16,10 @@ package virtualRAM_pkg is
     wbd_width     => x"7", -- 8/16/32-bit port granularity
     sdb_component => (
     addr_first    => x"0000000000000000",
-    addr_last     => x"00000000000000ff",
+    addr_last     => x"00000000000007ff",
     product       => (
     vendor_id     => x"0000000000000651",
-    device_id     => x"434E5451", -- !TODO change
+    device_id     => x"434E5449", -- !TODO change
     version       => x"00000001",
     date          => x"20240904",
     name          => "GSI:VIRTUALRAM     "))
@@ -28,7 +28,7 @@ package virtualRAM_pkg is
     
   component virtualRAM is
     generic (
-      g_size  : natural := 4096
+      g_size  : natural := 2048
     );
 
     port(
