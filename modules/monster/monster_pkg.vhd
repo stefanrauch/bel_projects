@@ -134,6 +134,7 @@ package monster_pkg is
       g_en_asmi              : boolean := false;
       g_en_psram_delay       : boolean := false;
       g_en_enc_err_counter   : boolean := false
+      g_en_virtualRAM        : boolean := false
     );
     port(
       -- Required: core signals
