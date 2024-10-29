@@ -74,6 +74,7 @@ use work.wb_i2c_wrapper_pkg.all;
 use work.remote_update_pkg.all;
 use work.enc_err_counter_pkg.all;
 use work.virtualRAM_pkg.all;
+use work.wb_dma_pkg.all;
 
 entity monster is
   generic(
@@ -130,8 +131,9 @@ entity monster is
     g_en_eca_tap           : boolean;
     g_en_asmi              : boolean;
     g_en_psram_delay       : boolean;
-    g_en_enc_err_counter   : boolean);
-    g_en_virtualRAM        : boolean);
+    g_en_enc_err_counter   : boolean;
+    g_en_virtualRAM        : boolean;
+    g_en_wb_dma            : boolean);
   port(
     -- Required: core signals
     core_clk_20m_vcxo_i    : in    std_logic;
@@ -433,7 +435,8 @@ architecture rtl of monster is
       topm_vme,
       topm_pmc,
       topm_usb,
-      topm_prioq
+      topm_prioq,
+      topm_wb_dma
     );
   constant c_top_my_masters : natural := top_my_masters'pos(top_my_masters'right)+1;
 
@@ -444,7 +447,8 @@ architecture rtl of monster is
     top_my_masters'pos(topm_vme)     => f_sdb_auto_msi(c_vme_msi,     g_en_vme),
     top_my_masters'pos(topm_pmc)     => f_sdb_auto_msi(c_pmc_msi,     g_en_pmc),
     top_my_masters'pos(topm_usb)     => f_sdb_auto_msi(c_usb_msi,     g_en_usb),
-    top_my_masters'pos(topm_prioq)   => f_sdb_auto_msi(c_null_msi,    false));
+    top_my_masters'pos(topm_prioq)   => f_sdb_auto_msi(c_null_msi,    false),
+    top_my_masters'pos(topm_wb_dma)  => f_sdb_auto_msi(c_null_msi,    false));
 
   -- The FTM adds a bunch of masters to this crossbar
   constant c_ftm_masters : t_sdb_record_array := f_lm32_masters_bridge_msis(g_lm32_cores);
@@ -590,7 +594,8 @@ architecture rtl of monster is
     tops_ebm,
     tops_beam_dump,
     tops_emb_cpu,
-    tops_ram
+    tops_ram,
+    tops_dma
     );
   constant c_top_slaves        : natural := top_slaves'pos(top_slaves'right)+1;
 
@@ -605,7 +610,8 @@ architecture rtl of monster is
    top_slaves'pos(tops_ebm)              => f_sdb_auto_device(c_ebm_sdb,                         true),
    top_slaves'pos(tops_emb_cpu)          => f_sdb_auto_device(c_eca_queue_slave_sdb,             g_en_eca),
    top_slaves'pos(tops_beam_dump)        => f_sdb_embed_device(c_beam_dump_sdb, x"7FFF0000",     g_en_beam_dump),
-   top_slaves'pos(tops_ram)              => f_sdb_auto_device(c_virtualRAM_sdb,                 g_en_virtualRAM));
+   top_slaves'pos(tops_ram)              => f_sdb_auto_device(c_virtualRAM_sdb,                  g_en_virtualRAM),
+   top_slaves'pos(tops_dma)              => f_sdb_auto_device(c_wb_dma_sdb,                      g_en_wb_dma));
 
   constant c_top_layout      : t_sdb_record_array := f_sdb_auto_layout(c_top_layout_req_masters, c_top_layout_req_slaves);
   constant c_top_sdb_address : t_wishbone_address := f_sdb_auto_sdb   (c_top_layout_req_masters, c_top_layout_req_slaves);
@@ -725,6 +731,10 @@ architecture rtl of monster is
   signal s_usb_fd_oen : std_logic;
 
   signal s_lm32_rstn : std_logic_vector(g_lm32_cores-1 downto 0);
+
+  signal dummy1 : std_logic;
+  signal dummy2 : std_logic;
+  signal dummy3 : std_logic;
 
   -- END OF Master signals
   ----------------------------------------------------------------------------------
@@ -3354,6 +3364,74 @@ end generate;
         slave_o => top_bus_master_i(top_slaves'pos(tops_ram))
         );
   end generate virtualRAM_y;
+
+
+  --------------------------------------------
+  -- wishbone DMA integration
+  --------------------------------------------
+  wb_dma_n : if not g_en_wb_dma generate
+    top_bus_master_i(top_slaves'pos(tops_dma)) <= cc_dummy_slave_out;
+  end generate;
+
+  wb_dma_y : if g_en_wb_dma generate
+    wb_dma_controller: wb_dma
+      port map (
+        clk_i => clk_sys,
+        rst_i => rstn_sys,
+
+        wb0s_data_i => top_bus_master_o(top_slaves'pos(tops_dma)).dat,
+        wb0s_data_o => top_bus_master_i(top_slaves'pos(tops_dma)).dat,
+        wb0_addr_i  => top_bus_master_o(top_slaves'pos(tops_dma)).adr,
+        wb0_sel_i   => top_bus_master_o(top_slaves'pos(tops_dma)).sel,
+        wb0_we_i    => top_bus_master_o(top_slaves'pos(tops_dma)).we,
+        wb0_cyc_i   => top_bus_master_o(top_slaves'pos(tops_dma)).cyc,
+        wb0_stb_i   => top_bus_master_o(top_slaves'pos(tops_dma)).stb,
+        wb0_ack_o   => top_bus_master_i(top_slaves'pos(tops_dma)).ack,
+        wb0_err_o   => top_bus_master_i(top_slaves'pos(tops_dma)).err,
+        wb0_rty_o   => top_bus_master_i(top_slaves'pos(tops_dma)).rty,
+        wb0m_data_i => top_bus_slave_o(top_my_masters'pos(topm_wb_dma)).dat,
+        wb0m_data_o => top_bus_slave_i(top_my_masters'pos(topm_wb_dma)).dat,
+        wb0_addr_o  => top_bus_slave_i(top_my_masters'pos(topm_wb_dma)).adr,
+        wb0_sel_o   => top_bus_slave_i(top_my_masters'pos(topm_wb_dma)).sel,
+        wb0_we_o    => top_bus_slave_i(top_my_masters'pos(topm_wb_dma)).we,
+        wb0_cyc_o   => top_bus_slave_i(top_my_masters'pos(topm_wb_dma)).cyc,
+        wb0_stb_o   => top_bus_slave_i(top_my_masters'pos(topm_wb_dma)).stb,
+        wb0_ack_i   => top_bus_slave_o(top_my_masters'pos(topm_wb_dma)).ack,
+        wb0_err_i   => top_bus_slave_o(top_my_masters'pos(topm_wb_dma)).err,
+        wb0_rty_i   => top_bus_slave_o(top_my_masters'pos(topm_wb_dma)).rty,
+
+        wb1s_data_i => c_DUMMY_WB_MASTER_OUT.dat,
+        wb1s_data_o => open,
+        wb1_addr_i  => c_DUMMY_WB_MASTER_OUT.adr,
+        wb1_sel_i   => c_DUMMY_WB_MASTER_OUT.sel,
+        wb1_we_i    => c_DUMMY_WB_MASTER_OUT.we,
+        wb1_cyc_i   => c_DUMMY_WB_MASTER_OUT.cyc,
+        wb1_stb_i   => c_DUMMY_WB_MASTER_OUT.stb,
+        wb1_ack_o   => open,
+        wb1_err_o   => open,
+        wb1_rty_o   => open,
+        wb1m_data_i => c_DUMMY_WB_SLAVE_OUT.dat,
+        wb1m_data_o => open,
+        wb1_addr_o  => open,
+        wb1_sel_o   => open,
+        wb1_we_o    => open,
+        wb1_cyc_o   => open,
+        wb1_stb_o   => open,
+        wb1_ack_i   => c_DUMMY_WB_SLAVE_OUT.ack,
+        wb1_err_i   => c_DUMMY_WB_SLAVE_OUT.err,
+        wb1_rty_i   => c_DUMMY_WB_SLAVE_OUT.rty,
+
+        dma_req_i   => '0',
+        dma_ack_o   => open,
+        dma_nd_i    => '0',
+        dma_rest_i  => '0',
+
+        inta_o      => open,
+        intb_o      => open
+      );
+  end generate wb_dma_y;
+
+
   -- END OF Wishbone slaves
   ----------------------------------------------------------------------------------
 

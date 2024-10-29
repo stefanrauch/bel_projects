@@ -44,7 +44,8 @@ use work.genram_pkg.all;
 
 entity virtualRAM is
   generic (
-    g_size  : natural
+    g_size    : natural;
+    g_nr_rams : natural
   );
 
   port(
@@ -58,24 +59,68 @@ end entity;
 
 architecture rtl of virtualRAM is
 
-  signal dummy : t_wishbone_slave_out;
+  signal ram_sel  : std_logic;
+  signal slave0_i : t_wishbone_slave_in;
+  signal slave0_o : t_wishbone_slave_out;
+  signal slave1_i : t_wishbone_slave_in;
+  signal slave1_o : t_wishbone_slave_out;
 
 begin
 
-  RAM : xwb_dpram
+  --solve this parametrically?
+  --tests needed!
+  ram_sel <= slave_i.adr(f_log2_size(g_size*4)+1);
+
+  slave0_i <= slave_i when ram_sel = '0' else c_DUMMY_WB_SLAVE_IN;
+  -- slave0_i.adr <= slave_i.adr(13 downto 0) when ram_sel = '0' else c_DUMMY_WB_SLAVE_IN; -- truncate address to avoid mirroring data from other RAMs !NOT NECESSARY IF DONE PROPERLY/ENOUGH ADDRESS SPACE IS RESERVED
+  slave1_i <= slave_i when ram_sel = '1' else c_DUMMY_WB_SLAVE_IN;
+
+  process (ram_sel)
+  begin
+    case ram_sel is
+      when '0' =>
+        slave_o <= slave0_o;
+      when '1' =>
+        slave_o <= slave1_o;
+    end case;
+  end process;
+
+  RAM1 : xwb_dpram
   generic map (
-    g_size => g_size,
-    g_must_have_init_file => false
+    g_size                  => g_size,
+    g_init_file             => "sw/main.ram",
+    g_must_have_init_file   => true,
+    g_slave1_interface_mode => CLASSIC,
+    g_slave1_granularity    => BYTE
   )
 
   port map (
     clk_sys_i => clk_sys_i,
     rst_n_i   => rst_n_i,
 
-    slave1_i => slave_i,
-    slave1_o => slave_o,
+    slave1_i => slave0_i,
+    slave1_o => slave0_o,
     slave2_i => c_DUMMY_WB_SLAVE_IN,
-    slave2_o => dummy
+    slave2_o => open
+  );
+
+
+  RAM2 : xwb_dpram
+  generic map (
+  g_size                  => g_size,
+    g_must_have_init_file   => false,
+    g_slave1_interface_mode => CLASSIC,
+    g_slave1_granularity    => BYTE
+  )
+
+  port map (
+    clk_sys_i => clk_sys_i,
+    rst_n_i   => rst_n_i,
+
+    slave1_i => slave1_i,
+    slave1_o => slave1_o,
+    slave2_i => c_DUMMY_WB_SLAVE_IN,
+    slave2_o => open
   );
 
 end architecture;

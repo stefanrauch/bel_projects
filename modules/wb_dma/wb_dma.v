@@ -90,7 +90,7 @@
 
 `include "wb_dma_defines.v"
 
-module wb_dma_top(clk_i, rst_i,
+module wb_dma(clk_i, rst_i,
 
 	wb0s_data_i, wb0s_data_o, wb0_addr_i, wb0_sel_i, wb0_we_i, wb0_cyc_i,
 	wb0_stb_i, wb0_ack_o, wb0_err_o, wb0_rty_o,
