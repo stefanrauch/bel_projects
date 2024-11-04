@@ -45,6 +45,7 @@ CHECK_SCU4             = ./syn/gsi_scu/control4/scu_control
 CHECK_FTM4             = ./syn/gsi_scu/ftm4/ftm4
 CHECK_FTM4DP           = ./syn/gsi_scu/ftm4dp/ftm4dp
 CHECK_FTM              = ./syn/gsi_pexarria5/ftm/ftm
+CHECK_UNIFTM           = ./syn/gsi_pexarria5/uniftm/uniftm
 CHECK_PEXARRIA10       = ./syn/gsi_pexarria10/control/pexarria10
 CHECK_FTM10            = ./syn/gsi_pexarria10/ftm10/ftm10
 CHECK_A10GX            = ./syn/gsi_a10gx_pcie/control/pci_control
@@ -68,6 +69,7 @@ PATH_SCU4              = syn/gsi_scu/control4
 PATH_FTM4              = syn/gsi_scu/ftm4
 PATH_FTM4DP            = syn/gsi_scu/ftm4dp
 PATH_FTM               = syn/gsi_pexarria5/ftm
+PATH_UNIFTM            = syn/gsi_pexarria5/uniftm
 PATH_PEXARRIA10        = syn/gsi_pexarria10/control
 PATH_FTM10             = syn/gsi_pexarria10/ftm10
 PATH_A10GX             = syn/gsi_a10gx_pcie/control
@@ -376,6 +378,18 @@ ftm-sort:
 
 ftm-check:
 	$(call check_timing, $(CHECK_FTM))
+
+uniftm:	firmware
+	$(MAKE) -C $(PATH_UNIFTM) all
+
+uniftm-clean::
+	$(MAKE) -C $(PATH_UNIFTM) clean
+
+uniftm-sort:
+	$(call sort_file, $(CHECK_UNIFTM))
+
+uniftm-check:
+	$(call check_timing, $(CHECK_UNIFTM))
 
 # #################################################################################################
 # Arria 10 devices
